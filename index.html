@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Star Ratings</title>
+    <link href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+        }
+
+        .container {
+            margin: 25px auto;
+            text-align: center;
+        }
+
+        .stars {
+            display: inline-block;
+        }
+
+        .fa-star {
+            cursor: pointer;
+        }
+
+        .far.fa-star {
+            font-size: 4rem;
+        }
+
+        .fas.fa-star {
+            -webkit-text-stroke-width: 7px;
+            -webkit-text-stroke-color: black;
+            color: yellow;
+            font-size: 4rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="stars"></div>
+        <h1 class="star-text"></h1>
+    </div>
+
+    <script>
+        (() => {
+            const $ = document.querySelector.bind(document);
+
+            function Star(parent) {
+                this.$parent = $(parent);
+                this.createEl();
+            }
+
+            Star.prototype.createEl = function() {
+                this.$el = document.createElement('i');
+                this.$el.className = 'far fa-star';
+                this.$parent.append(this.$el);
+            };
+
+            Star.prototype.deselect = function() {
+                this.$el.className = 'far fa-star';
+            };
+
+            Star.prototype.select = function() {
+                this.$el.className = 'fas fa-star';
+            };
+
+            Star.prototype.on = function(event, fn) {
+                this.$el.addEventListener(event, fn);
+            };
+
+            function StarText(selector) {
+                this.$el = $(selector);
+                this.selected = false;
+                this.stars = 0;
+                this.changeText();
+            }
+
+            StarText.prototype.changeText = function() {
+                this.$el.textContent = `You ${this.selected ? 'have given' : 'are giving'} ${this.stars} Stars!`;
+            };
+
+            StarText.prototype.setStars = function(stars) {
+                this.stars = stars;
+                this.changeText();
+            };
+
+            StarText.prototype.select = function() {
+                this.selected = true;
+                this.changeText();
+            };
+
+            StarText.prototype.unselect = function() {
+                this.selected = false;
+                this.changeText();
+            };
+            
+            window.onload = () => {
+                const starText = new StarText('.star-text');
+                let stars = [0,0,0,0,0];
+                stars = stars.map(() => new Star('.stars'));
+
+                stars.forEach((star, i) => {
+                    star.on('mouseover', () => {
+                        stars.forEach(s => s.deselect());
+                        stars.slice(0, i + 1).forEach(s => s.select());
+                        starText.unselect();
+                        starText.setStars(i + 1);
+                    });
+
+                    star.on('click', () => {
+                        starText.select();
+                    });
+                });
+            };
+        })();
+    </script>
+</body>
+</html>
